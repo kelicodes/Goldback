@@ -1,7 +1,7 @@
 import express from 'express'
 import userRouter from "./Routes/userRouter.js"
 import productRouter from "./Routes/productRoute.js"
-import DB from "./Config/Db.js"
+import DB from "./Config/DB.js"
 import "dotenv/config"
 import cors from "cors"
 

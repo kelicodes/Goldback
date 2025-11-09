@@ -5,12 +5,14 @@ import {
   getUserOrders,
   getOrderById,
   updateOrderStatus,
+  getAllOrders
 } from "../Controllers/Orderscontroller.js"
 
 const OrderRouter = express.Router();
 
 OrderRouter.post("/", UserAuth, createOrder);
 OrderRouter.get("/", UserAuth, getUserOrders);
+OrderRouter.get('/all',UserAuth,getAllOrders)
 OrderRouter.get("/:orderId", UserAuth, getOrderById);
 OrderRouter.put("/:orderId/status", UserAuth, updateOrderStatus); // Admin logic optional
 

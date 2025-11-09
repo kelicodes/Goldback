@@ -8,6 +8,7 @@ export const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
 
   if (!productId) return res.status(400).json({ message: "Product ID missing" });
+  if(!quantity) return res.status(400).json({ message: "quantinty missing" });
 
   try {
     // ✅ Check if product exists
@@ -41,6 +42,7 @@ export const addToCart = async (req, res) => {
     res.status(200).json(cart);
 
   } catch (error) {
+    console.log("error in add to acrt",error)
     res.status(500).json({ message: "Server error", error });
   }
 };

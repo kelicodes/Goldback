@@ -75,9 +75,9 @@ export const fetchproducts=async(req,res)=>{
 		return res.json({message:"fecthproduct failed",success:false})
 	}
 }
-
 export const fetchproduct = async (req, res) => {
   try {
+
     const { productid } = req.params;
     const theproduct = await product.findById(productid);
     if (!theproduct) {

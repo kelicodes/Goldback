@@ -23,6 +23,12 @@ export const userRegistration=async (req,res)=>{
 
 		await newuser.save()
 		const token=JWT.sign({id:newuser._id},process.env.SECRETWORD)
+		res.cookie("token", token, {
+  httpOnly: true,
+  secure: false, // true if using HTTPS
+  maxAge: 1000 * 60 * 60 * 24, // 1 day
+});
+
 
 		return res.json({success:true,message:"userRegistration successfull",token})
 	}catch(e){
@@ -48,6 +54,12 @@ export const userSignin=async(req,res)=>{
 			return res.json({success:false,message:"invalid password"})
 		}
 		const token=JWT.sign({id:theuser._id},process.env.SECRETWORD)
+		res.cookie("token", token, {
+  httpOnly: true,
+  secure: false, // true if using HTTPS
+  maxAge: 1000 * 60 * 60 * 24, // 1 day
+});
+
 		return res.json({success:true,message:"user signin successfull",token})
 	}catch(e){
 		console.log(e)

@@ -1,0 +1,17 @@
+import express from "express";
+import  UserAuth from "../Middleware/userAuth.js"
+import {
+  createOrder,
+  getUserOrders,
+  getOrderById,
+  updateOrderStatus,
+} from "../Controllers/Orderscontroller.js"
+
+const OrderRouter = express.Router();
+
+OrderRouter.post("/", UserAuth, createOrder);
+OrderRouter.get("/", UserAuth, getUserOrders);
+OrderRouter.get("/:orderId", UserAuth, getOrderById);
+OrderRouter.put("/:orderId/status", UserAuth, updateOrderStatus); // Admin logic optional
+
+export default OrderRouter;

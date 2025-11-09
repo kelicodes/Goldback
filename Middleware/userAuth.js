@@ -2,15 +2,18 @@ import JWT from "jsonwebtoken";
 
 export const UserAuth = async (req, res, next) => {
   try {
-    // Read token from request body (or you could use query params)
-    const token = req.body.token; 
-    if (!token) {
+    // Read token from headers
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ success: false, message: "No token provided" });
     }
 
-    const tokenCheck = JWT.verify(token, process.env.SECRETWORD);
-    if (tokenCheck.id) {
-      req.user = { _id: tokenCheck.id };
+    const token = authHeader.split(" ")[1]; // Get the token part
+    const decoded = JWT.verify(token, process.env.SECRETWORD);
+
+    if (decoded.id) {
+      req.user = { _id: decoded.id };
       return next();
     }
 
@@ -22,4 +25,4 @@ export const UserAuth = async (req, res, next) => {
   }
 };
 
-export default UserAuth
+export default UserAuth;

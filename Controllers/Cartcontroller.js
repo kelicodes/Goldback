@@ -65,6 +65,35 @@ export const removeFromCart = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+//get my cart
+export const getmyCart = async (req, res) => {
+  const userId = req.user._id; // set by verifyToken middleware
+
+  try {
+    // Find cart for the user and populate product details
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+    if (!cart || cart.items.length === 0) {
+      return res.status(200).json({ items: [], message: "Cart is empty" });
+    }
+
+    // Transform cart items to include product info
+    const items = cart.items.map((item) => ({
+      productId: item.productId._id,
+      name: item.productId.name,
+      price: item.productId.price,
+      image: item.productId.image,
+      quantity: item.quantity,
+    }));
+
+    res.status(200).json({ items });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
 
 // ✅ GET CART (POPULATE PRODUCT DETAILS)
 export const getCart = async (req, res) => {

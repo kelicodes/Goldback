@@ -17,7 +17,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
 	origin:["http://localhost:5173","https://mygold-two.vercel.app"],
-	credentials:true
+	credentials: true,
 }))
 
 

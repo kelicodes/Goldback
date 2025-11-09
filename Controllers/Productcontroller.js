@@ -76,17 +76,20 @@ export const fetchproducts=async(req,res)=>{
 	}
 }
 
+export const fetchproduct = async (req, res) => {
+  try {
+    const { productid } = req.params;
+    const theproduct = await product.findById(productid);
+    if (!theproduct) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    return res.json({ success: true, message: "Product fetched", theproduct });
+  } catch (e) {
+    console.log(e);
+    return res.json({ message: "fetchproduct failed", success: false });
+  }
+};
 
-export const fetchproduct=async(req,res)=>{
-	try{
-		const {productid}=req.params
-		const theproduct= await product.findById({productid})
-		return res.json({success:true,message:"product fetched",theproduct})
-	}catch(e){
-		console.log(e)
-		return res.json({message:"fetchproduct failed",success:false,})
-	}
-}
 
 
 export const removeProduct=async(req,res)=>{

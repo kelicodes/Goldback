@@ -14,7 +14,12 @@ const OrderSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   status: { type: String, default: "Pending" }, // Pending, Completed, Cancelled, etc.
   paymentMethod: { type: String, default: "MPESA" }, // optional
-  shippingAddress: { type: String },
+  shippingAddress: {
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    apartment: { type: String },
+    doorNumber: { type: String, required: true },
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

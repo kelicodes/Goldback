@@ -1,7 +1,9 @@
 import product from "../Models/Productmodel.js";
 import cloudinary from "../Config/Cloud.js";
 import fs from "fs";
+import mongoose from "mongoose";
 
+// ======= Upload a new product =======
 export const productUpload = async (req, res) => {
   try {
     const { name, price, category, desc } = req.body;
@@ -65,22 +67,23 @@ export const productUpload = async (req, res) => {
   }
 };
 
+// ======= Fetch all products =======
+export const fetchproducts = async (req, res) => {
+  try {
+    const products = await product.find({});
+    return res.json({ success: true, message: "Products fetched", products });
+  } catch (e) {
+    console.error(e);
+    return res.json({ success: false, message: "Fetch products failed" });
+  }
+};
 
-export const fetchproducts=async(req,res)=>{
-	try{
-		const products= await product.find({})
-		return res.json({success:true,message:"products fetvhed",products})
-	}catch(e){
-		console.log(e)
-		return res.json({message:"fecthproduct failed",success:false})
-	}
-}
-
+// ======= Fetch single product by ID =======
 export const fetchproduct = async (req, res) => {
   try {
     const { productid } = req.params;
 
-    // ✅ validate productid to avoid CastError
+    // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(productid)) {
       return res
         .status(400)
@@ -97,20 +100,27 @@ export const fetchproduct = async (req, res) => {
 
     return res.json({ success: true, message: "Product fetched", theproduct });
   } catch (e) {
-    console.log(e);
-    return res.json({ message: "fetchproduct failed", success: false });
+    console.error(e);
+    return res.json({ success: false, message: "Fetch product failed" });
   }
 };
 
+// ======= Remove product =======
+export const removeProduct = async (req, res) => {
+  try {
+    const { itemId } = req.params;
 
+    // Validate itemId
+    if (!mongoose.Types.ObjectId.isValid(itemId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid product ID format" });
+    }
 
-export const removeProduct=async(req,res)=>{
-	try{
-		const {itemId}=req.params
-		await product.findByIdAndDelete(itemId)
-		return res.json({success:true,message:"product remove"})
-	}catch(e){
-		console.log(e)
-		return res.json({success:false,message:"product removed"})
-	}
-}
+    await product.findByIdAndDelete(itemId);
+    return res.json({ success: true, message: "Product removed successfully" });
+  } catch (e) {
+    console.error(e);
+    return res.json({ success: false, message: "Remove product failed" });
+  }
+};

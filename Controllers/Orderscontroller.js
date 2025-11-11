@@ -23,13 +23,16 @@ export const createOrder = async (req, res) => {
 
     const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+    // ✅ Set status depending on payment method
+    const status = paymentMethod === "Cash" ? "Pending" : "Awaiting Payment";
+
     const newOrder = await Order.create({
       userId,
       items,
       totalAmount,
       paymentMethod,
       shippingAddress,
-      status: "Pending",
+      status,
     });
 
     // Clear cart
@@ -38,13 +41,17 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Order created successfully",
+      message:
+        paymentMethod === "Cash"
+          ? "Order created! Pay on delivery."
+          : "Order created. Proceed to payment.",
       order: newOrder,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
+
 
 // ✅ GET ALL ORDERS FOR CURRENT USER
 export const getUserOrders = async (req, res) => {

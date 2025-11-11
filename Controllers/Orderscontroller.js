@@ -1,3 +1,5 @@
+// controllers/orderController.js
+
 import Order from "../Models/Order.js";
 import Cart from "../Models/Cartmodel.js";
 
@@ -7,13 +9,22 @@ export const createOrder = async (req, res) => {
   const { paymentMethod, shippingAddress } = req.body;
 
   try {
+    // Find user's cart and populate product details
     const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-    if (!cart || cart.items.length === 0) {
+    if (!cart || !Array.isArray(cart.items) || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
 
-    const items = cart.items.map((item) => ({
+    // Filter out invalid items (missing productId)
+    const validItems = cart.items.filter(item => item.productId);
+
+    if (validItems.length === 0) {
+      return res.status(400).json({ success: false, message: "Cart has invalid items" });
+    }
+
+    // Map cart items to order items
+    const items = validItems.map(item => ({
       productId: item.productId._id,
       name: item.productId.name,
       price: item.productId.price,
@@ -23,9 +34,10 @@ export const createOrder = async (req, res) => {
 
     const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    // ✅ Set status depending on payment method
+    // Set status depending on payment method
     const status = paymentMethod === "Cash" ? "Pending" : "Awaiting Payment";
 
+    // Create new order
     const newOrder = await Order.create({
       userId,
       items,
@@ -48,10 +60,10 @@ export const createOrder = async (req, res) => {
       order: newOrder,
     });
   } catch (error) {
+    console.error("Create Order Error:", error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
-
 
 // ✅ GET ALL ORDERS FOR CURRENT USER
 export const getUserOrders = async (req, res) => {
@@ -61,6 +73,7 @@ export const getUserOrders = async (req, res) => {
     const orders = await Order.find({ userId }).sort({ createdAt: -1 });
     res.status(200).json({ success: true, orders });
   } catch (error) {
+    console.error("Get User Orders Error:", error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
@@ -75,6 +88,7 @@ export const getOrderById = async (req, res) => {
 
     res.status(200).json({ success: true, order });
   } catch (error) {
+    console.error("Get Order By ID Error:", error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
@@ -99,6 +113,7 @@ export const updateOrderStatus = async (req, res) => {
 
     res.status(200).json({ success: true, message: `Order status updated to ${status}`, order });
   } catch (error) {
+    console.error("Update Order Status Error:", error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
@@ -109,6 +124,7 @@ export const getAllOrders = async (req, res) => {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, orders });
   } catch (error) {
+    console.error("Get All Orders Error:", error);
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };

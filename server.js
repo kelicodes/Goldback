@@ -1,37 +1,65 @@
-import express from 'express'
-import userRouter from "./Routes/userRouter.js"
-import productRouter from "./Routes/productRoute.js"
-import DB from "./Config/DB.js"
-import "dotenv/config"
+import express from "express";
 import cookieParser from "cookie-parser";
-import cors from "cors"
-import Cartrouter from './Routes/Cartroutes.js'
-import Orderrouter from './Routes/OrderRoutes.js'
-import Pesarouter from './Routes/Pesaroutes.js'
+import cors from "cors";
+import "dotenv/config";
 
+// Import routers
+import userRouter from "./Routes/userRouter.js";
+import productRouter from "./Routes/productRoute.js";
+import Cartrouter from "./Routes/Cartroutes.js";
+import Orderrouter from "./Routes/OrderRoutes.js";
+import Pesarouter from "./Routes/Pesaroutes.js";
 
+// Import database
+import DB from "./Config/DB.js";
 
-const app=express()
-const PORT = process.env.PORT || 4000
-app.use(express.json())
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+// ====== MIDDLEWARES ======
+
+// Parse JSON bodies
+app.use(express.json());
+
+// Parse URL-encoded bodies (for forms)
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
-app.use(cors({
-	origin:["http://localhost:5173","https://mygold-two.vercel.app"],
-	credentials: true,
-}))
 
+// Cookie parser
+app.use(cookieParser());
 
+// CORS (allow your frontend domains)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // local frontend
+      "https://mygold-two.vercel.app", // deployed frontend
+    ],
+    credentials: true, // allow cookies
+  })
+);
 
-DB()
+// ====== DATABASE ======
+DB();
 
-app.use('/user',userRouter)
-app.use('/products',productRouter)
-app.use('/cart',Cartrouter)
-app.use("/orders",Orderrouter)
-app.use("/pesa",Pesarouter)
+// ====== ROUTES ======
+app.use("/user", userRouter);
+app.use("/products", productRouter);
+app.use("/cart", Cartrouter);
+app.use("/orders", Orderrouter);
+app.use("/pesa", Pesarouter);
 
+// ====== HEALTH CHECK ======
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
-app.listen(PORT,()=>{
-	console.log(`listening on port ${PORT}`)
-})
+// ====== GLOBAL ERROR HANDLER (optional) ======
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: "Server error" });
+});
+
+// ====== START SERVER ======
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});

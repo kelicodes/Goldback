@@ -75,14 +75,26 @@ export const fetchproducts=async(req,res)=>{
 		return res.json({message:"fecthproduct failed",success:false})
 	}
 }
+
 export const fetchproduct = async (req, res) => {
   try {
-
     const { productid } = req.params;
-    const theproduct = await product.findById(productid);
-    if (!theproduct) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+
+    // ✅ validate productid to avoid CastError
+    if (!mongoose.Types.ObjectId.isValid(productid)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid product ID format" });
     }
+
+    const theproduct = await product.findById(productid);
+
+    if (!theproduct) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
     return res.json({ success: true, message: "Product fetched", theproduct });
   } catch (e) {
     console.log(e);
